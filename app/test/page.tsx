@@ -1,5 +1,5 @@
 "use client"
-import IngredientList from "@/components/IngredientList";
+import ingredients from "@/components/ingredients";
 import MyDropzone from "@/components/MyDropzone";
 
 export default function Test() {
@@ -7,7 +7,7 @@ export default function Test() {
     return(
         <div>
             <MyDropzone/>
-            {/* <IngredientList/> */}
+            {/* <ingredients/> */}
         </div>
     )
 }

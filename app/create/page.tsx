@@ -19,11 +19,11 @@ export default function Create() {
     const [files, setFiles] = useState<FileWithPath[]>([]);
 
     interface FormValues {
-        recipeName: string,
-        serveSize: string,
-        cookTime: string,
+        recipe_name: string,
+        serving_size: string,
+        duration: string,
         files?: FileWithPath[],
-        ingredientList: [{
+        ingredients: [{
             name: string,
             quantity: string,
             key: number
@@ -44,19 +44,19 @@ export default function Create() {
         mode: 'uncontrolled',
         initialValues: {
             files,
-            recipeName: '',
-            serveSize: '',
-            cookTime: '',
-            ingredientList: [{ name: '', quantity: '', key: 0 }],
+            recipe_name: '',
+            serving_size: '',
+            duration: '',
+            ingredients: [{ name: '', quantity: '', key: 0 }],
             instructions: ''
         },
 
         validate: {
-            recipeName: (value) => (value.length < 2 ? 'Name must have at least 2 letters' : null),
-            serveSize: isNotEmpty(),
-            cookTime: isNotEmpty(),
+            recipe_name: (value) => (value.length < 2 ? 'Name must have at least 2 letters' : null),
+            serving_size: isNotEmpty(),
+            duration: isNotEmpty(),
             files: () => (files.length === 0 ? 'Recipe must have an image' : null),
-            ingredientList: {
+            ingredients: {
                 name: isNotEmpty(),
                 quantity: isNotEmpty()
             },
@@ -83,7 +83,7 @@ export default function Create() {
     });
 
 
-    const fields = form.values.ingredientList.map((item, index) => (
+    const fields = form.values.ingredients.map((item, index) => (
 
 
 
@@ -91,16 +91,16 @@ export default function Create() {
             <TextInput
                 label="Ingredient Name"
                 placeholder="paprika"
-                {...form.getInputProps(`ingredientList.${index}.name`)}
+                {...form.getInputProps(`ingredients.${index}.name`)}
 
             />
-            <TextInput label="Quant" {...form.getInputProps(`ingredientList.${index}.quantity`)} />
+            <TextInput label="Quant" {...form.getInputProps(`ingredients.${index}.quantity`)} />
 
 
 
             {index != 0 && (
 
-                <svg onClick={() => form.removeListItem('ingredientList', index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 mt-6 hover:text-red-600   cursor-pointer  ">
+                <svg onClick={() => form.removeListItem('ingredients', index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 mt-6 hover:text-red-600   cursor-pointer  ">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
 
@@ -137,7 +137,7 @@ export default function Create() {
 
         console.log("Sending: ", data);
 
-        let res = await axios.post('http://localhost:4000', toFormData(data))
+        let res = await axios.post('http://localhost:4000/create', toFormData(data))
 
         console.log(res);
 
@@ -193,28 +193,28 @@ export default function Create() {
                     )}
                     <TextInput
                         label="Recipe Name"
-                        key={form.key('recipeName')}
+                        key={form.key('recipe_name')}
                         placeholder="Fried Green Tomatos"
-                        {...form.getInputProps('recipeName')}
+                        {...form.getInputProps('recipe_name')}
                     />
                     <TextInput
                         label="Serving Size"
-                        key={form.key('serveSize')}
+                        key={form.key('serving_size')}
                         placeholder="5 guys"
-                        {...form.getInputProps('serveSize')}
+                        {...form.getInputProps('serving_size')}
 
                     />
                     <TextInput
                         label="Cook Time"
-                        key={form.key('cookTime')}
+                        key={form.key('duration')}
                         placeholder="5 years"
-                        {...form.getInputProps('cookTime')}
+                        {...form.getInputProps('duration')}
 
                     />
 
                     <div className='Ingredient list'>
                         {fields}
-                        <Button onClick={() => form.insertListItem('ingredientList', { name: '', quantity: '', key: randomId() })}>
+                        <Button onClick={() => form.insertListItem('ingredients', { name: '', quantity: '', key: randomId() })}>
                             Add Ingredient
                         </Button>
 

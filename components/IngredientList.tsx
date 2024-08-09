@@ -1,6 +1,6 @@
 import { Button, Flex, NumberInput, Select, TextInput } from "@mantine/core";
 
-export default function IngredientList({IngredientCount, setIngredientCount}) {
+export default function ingredients({IngredientCount, setIngredientCount}) {
 
     const Item = (key: number) => {
         return (
