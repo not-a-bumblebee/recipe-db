@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id Int @default(autoincrement()) @id
+  email String @unique
+  pw String
+  recipes Recipe[]
+}
+
+model Recipe{
+  id Int @default(autoincrement()) @id
+  recipe_name String
+  duration String
+  serving_size String
+  ingredients String
+  creator User @relation(fields: [user_id], references: [id])
+  user_id Int
+  image_url String
+  instructions String
+  recipeTag RecipeTags[]
+}
+
+model Tag{
+  id Int @default(autoincrement()) @id
+  tag_name String @unique
+  recipeTag RecipeTags[]
+}
+
+model RecipeTags{
+  recipe Recipe @relation(fields: [recipe_id],references: [id], onDelete: Cascade)
+  recipe_id Int 
+  tag Tag  @relation(fields: [tag_id],references: [id])
+  tag_id Int 
+  @@id([recipe_id,tag_id])
+}
