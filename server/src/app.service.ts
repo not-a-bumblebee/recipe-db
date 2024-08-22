@@ -42,7 +42,16 @@ export class RecipeService {
   }
 
   async getRecipe(id: string): Promise<Recipe> {
-    return await this.prisma.recipe.findUnique({ where: { id: parseInt(id) } });
+    return await this.prisma.recipe.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        creator: {
+          select: {
+            username: true
+          }
+        }
+      }
+    });
   }
 
   async postRecipe(body, file): Promise<Recipe> {
@@ -129,12 +138,52 @@ export class RecipeService {
     // replace image if new one is provided.
     // upsert the new ingredient_tags
     // delete any strays
-
     const { id, ...changes } = body
-    if(changes.ingredients)
+    
+    let ingredientChanges = []
+
+    if (changes?.ingredients) {
+
       changes.ingredients = JSON.stringify(changes.ingredients)
+
+      ingredientChanges.push(
+        // Deleting recipetags associated with the recipe so they can be replaced.
+        this.prisma.recipeTags.deleteMany({
+          where: {
+            recipe_id: body.id,
+          }
+        }),
+        // Replacing the recipetags that were deleted
+        ...body.ingredients.map(x => {
+          let ingredientName = x.name.trim().replaceAll(' ', '_').toLowerCase()
+          return this.prisma.tag.upsert({
+            where: {
+              tag_name: ingredientName
+            },
+            update: {
+              recipeTag: {
+                create: {
+                  recipe_id: id
+                },
+              }
+            },
+            create: {
+              tag_name: ingredientName,
+              recipeTag: {
+                create: {
+                  recipe_id: id
+                },
+              }
+            },
+          })
+        })
+
+      )
+    }
     console.log("Changes:" + changes);
     console.log(typeof id);
+
+console.log(changes.ingredients ? ingredientChanges : null);
 
 
     const [updateRes, deleteRes, recipeTagRes] = await this.prisma.$transaction([
@@ -145,36 +194,9 @@ export class RecipeService {
         },
         data: changes
       }),
-      // Deleting recipetags associated with the recipe so they can be replaced.
-      this.prisma.recipeTags.deleteMany({
-        where: {
-          recipe_id: body.id,
-        }
-      }),
-      // Replacing the recipetags
-      ...[...body.ingredients.map( x => {
-        let ingredientName = x.name.trim().replaceAll(' ', '_').toLowerCase()
-        return  this.prisma.tag.upsert({
-          where: {
-            tag_name: ingredientName
-          },
-          update: {
-            recipeTag: {
-              create: {
-                recipe_id: id
-              },
-            }
-          },
-          create: {
-            tag_name: ingredientName,
-            recipeTag: {
-              create: {
-                recipe_id: id
-              },
-            }
-          },
-        })
-      })]
+
+      ...(changes?.ingredients ? ingredientChanges : [])
+
     ])
 
     console.log(updateRes, deleteRes, recipeTagRes);

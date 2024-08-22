@@ -63,9 +63,15 @@ export class SearchService {
     async mixSearch(query: string) {
         // \b(?<!-|"|')\w+(?!"|')\b get included tags minus recipe names
         let searchRName = query.match(/(?<="|')[a-zA-Z0-9_ ]+(?="|')/g)
-        let includedTags = query.match(/\b(?<!-|"|')\w+(?!"|')\b/g)
+        // \b(?<!-|"|'|\()\w+(?!"|'|\))\b
+        let includedTags = query.match(/\b(?<!-|"|'|\()\w+(?!"|'|\))\b/g)
         let excludedTags = query.match(/(?<=-)[a-zA-Z_]+/g)
-
+        let usernameSearch = query.match(/(?<=\()[a-zA-Z0-9_ ]+(?=\))/g)
+        // username search   (?<=\()[a-zA-Z0-9_ ]+(?=\))
+        console.log("Username search: ", usernameSearch);
+        console.log("recipe name search: ", searchRName);
+        console.log("included tags: ", includedTags);
+        console.log("excluded tags: ", excludedTags);
 
 
         let res = await this.prisma.recipe.findMany(
@@ -77,6 +83,16 @@ export class SearchService {
                                 recipe_name: {
                                     contains: searchRName[0],
                                     mode: "insensitive"
+                                }
+                            })
+                        },
+                        {
+                            ...(usernameSearch != null && {
+                                creator: {
+                                    username: {
+                                        in: usernameSearch,
+                                        mode: "insensitive"
+                                    }
                                 }
                             })
                         },
@@ -110,8 +126,17 @@ export class SearchService {
                             })
                         }
                     ]
-                }
+                },
+                include: {
+                    creator: {
+                      select: {
+                        username: true
+                      }
+                    }
+                  }
             });
+        console.log(res);
+
         return res
     }
 

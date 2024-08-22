@@ -16,8 +16,10 @@ datasource db {
 
 model User{
   id Int @default(autoincrement()) @id
+  firebase_id String @unique
+  username String? @default("anonymouse")
   email String @unique
-  pw String
+  // pw String
   recipes Recipe[]
 }
 
@@ -27,8 +29,8 @@ model Recipe{
   duration String
   serving_size String
   ingredients String
-  creator User @relation(fields: [user_id], references: [id])
-  user_id Int
+  creator User @relation(fields: [user_id], references: [firebase_id])
+  user_id String
   image_url String
   instructions String
   recipeTag RecipeTags[]

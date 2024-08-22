@@ -1,5 +1,5 @@
 'use client'
-import { Badge, Button, Card, Group, Image, Spoiler, Text, Title } from "@mantine/core"
+import { Badge, Button, Card, Flex, Group, Image, Spoiler, Text, Title, UnstyledButton } from "@mantine/core"
 import axios from "axios"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -17,7 +17,11 @@ interface RecipeType {
     ingredients: IngredientType[],
     user_id: string,
     image_url: string,
-    instructions: string
+    instructions: string,
+    creator?: {
+        username: string
+    },
+
 }
 
 export default function SearchPage() {
@@ -44,10 +48,18 @@ export default function SearchPage() {
 
     }, [])
 
+    const searchCreator = async (name: string) => {
+        let nameField = `(${name})`
+        let toUrl = new URL(window.location.href)
+        toUrl.searchParams.set('mode', 'Mix')
+        toUrl.searchParams.set('query', nameField)
+
+        router.push("/search" + toUrl.search)
+
+    }
 
 
-
-    const RecipeCard = ({ id, duration, image_url, ingredients, recipe_name, serving_size, user_id }: RecipeType) => {
+    const RecipeCard = ({ id, duration, image_url, ingredients, recipe_name, serving_size, user_id, creator }: RecipeType) => {
         let parsedIngredients = JSON.parse(ingredients as string | any)
 
         return (
@@ -63,6 +75,10 @@ export default function SearchPage() {
                 <Group>
                     <Text>{"Serving Size:" + serving_size}</Text>
                     <Text>{"Cook Time: " + duration}</Text>
+                    <Flex>
+                        <Text>By: </Text>
+                        <UnstyledButton m={0} fw={500} onClick={() => searchCreator(creator?.username as string)}>{creator?.username}</UnstyledButton>
+                    </Flex>
                 </Group>
                 <Title fw={400} order={3}>Ingredients: </Title>
                 <Spoiler maxHeight={120} showLabel="Show More" hideLabel="Hide">

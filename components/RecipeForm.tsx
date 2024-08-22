@@ -1,5 +1,4 @@
 'use client'
-import MyDropzone from '@/components/MyDropzone';
 import { TextInput, NumberInput, Select, Button, Flex, Group, Paper, BackgroundImage, Text, Input } from '@mantine/core';
 import { FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { isNotEmpty, useForm } from '@mantine/form';
@@ -13,6 +12,7 @@ import { Dropzone } from '@mantine/dropzone';
 import CharacterCount from '@tiptap/extension-character-count';
 import axios, { toFormData } from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/app/store';
 interface FormValues {
     recipe_name: string,
     serving_size: string,
@@ -35,9 +35,11 @@ interface RecipeFormProps extends FormValues {
 }
 export default function RecipeForm({ duration, image_url, ingredients, instructions, recipe_name, serving_size, editMode = false, id }: Partial<RecipeFormProps>) {
     const [files, setFiles] = useState<FileWithPath[]>([]);
-
+    const userCred = useAuthStore((state) => state.userCred)
+    const idToken = useAuthStore((state) => state.idToken)
 
     console.log(duration, image_url, ingredients, instructions, recipe_name, serving_size);
+
 
 
     const router = useRouter()
@@ -157,65 +159,77 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
     }
 
     const editRecipe = async () => {
+        try {
 
-        // check for differences
-        let ingrChanges = false
-        let recipeForm = form.getValues()
-        // let recipeData = {
-        //     ...(recipeForm.duration.trim() != duration && { duration: recipeForm.duration.trim() }),
-        //     ...(files.length > 0 && { file: files[0] }),
-        //     ingredients,
-        //     ...(editor?.getHTML() != instructions && { instructions: editor?.getHTML() }),
-        //     ...(recipeForm.recipe_name.trim() != recipe_name && { recipe_name: recipeForm.recipe_name.trim() }),
-        //     ...(recipeForm.serving_size.trim() != serving_size && { serving_size: recipeForm.serving_size.trim() }),
-        //     recipe_id
-        // }
-        // if ingredients are different set ingrChanges to true
 
-        if (ingredients) {
-            if (ingredients.length != recipeForm.ingredients.length) {
-                ingrChanges = true
+            // check for differences
+            let ingrChanges = false
+            let recipeForm = form.getValues()
+            // let recipeData = {
+            //     ...(recipeForm.duration.trim() != duration && { duration: recipeForm.duration.trim() }),
+            //     ...(files.length > 0 && { file: files[0] }),
+            //     ingredients,
+            //     ...(editor?.getHTML() != instructions && { instructions: editor?.getHTML() }),
+            //     ...(recipeForm.recipe_name.trim() != recipe_name && { recipe_name: recipeForm.recipe_name.trim() }),
+            //     ...(recipeForm.serving_size.trim() != serving_size && { serving_size: recipeForm.serving_size.trim() }),
+            //     recipe_id
+            // }
+            // if ingredients are different set ingrChanges to true
 
-            }
-            if (!ingrChanges) {
-                for (let i = 0; i < recipeForm.ingredients.length; i++) {
-                    let nwName = recipeForm.ingredients[i].name
-                    let nwQuantity = recipeForm.ingredients[i].quantity
+            if (ingredients) {
+                if (ingredients.length != recipeForm.ingredients.length) {
+                    ingrChanges = true
 
-                    let oldName = ingredients[i].name
-                    let oldQuantity = ingredients[i].quantity
+                }
+                if (!ingrChanges) {
+                    for (let i = 0; i < recipeForm.ingredients.length; i++) {
+                        let nwName = recipeForm.ingredients[i].name
+                        let nwQuantity = recipeForm.ingredients[i].quantity
 
-                    if ((nwName != oldName) || (nwQuantity != oldQuantity)) {
-                        ingrChanges = true
-                        break;
+                        let oldName = ingredients[i].name
+                        let oldQuantity = ingredients[i].quantity
+
+                        if ((nwName != oldName) || (nwQuantity != oldQuantity)) {
+                            ingrChanges = true
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        let recipeChanges = {
-            ...(recipeForm.duration.trim() != duration && { duration: recipeForm.duration.trim() }),
-            ...(files.length > 0 && { file: files[0] }),
-            ...(ingrChanges && { ingredients: recipeForm.ingredients }),
-            ...(editor?.getHTML() != instructions && { instructions: editor?.getHTML() }),
-            ...(recipeForm.recipe_name.trim() != recipe_name && { recipe_name: recipeForm.recipe_name.trim() }),
-            ...(recipeForm.serving_size.trim() != serving_size && { serving_size: recipeForm.serving_size.trim() }),
-            id
-        }
+            let recipeChanges = {
+                ...(recipeForm.duration.trim() != duration && { duration: recipeForm.duration.trim() }),
+                ...(files.length > 0 && { file: files[0] }),
+                ...(ingrChanges && { ingredients: recipeForm.ingredients }),
+                ...(editor?.getHTML() != instructions && { instructions: editor?.getHTML() }),
+                ...(recipeForm.recipe_name.trim() != recipe_name && { recipe_name: recipeForm.recipe_name.trim() }),
+                ...(recipeForm.serving_size.trim() != serving_size && { serving_size: recipeForm.serving_size.trim() }),
+                id
+            }
 
-        console.log("Recipe Changes: ",recipeChanges);
-        
+            console.log("Recipe Changes: ", recipeChanges);
 
+            // let idToken = await userCred?.user?.getIdToken()
 
-        let { data, status } = await axios.put('http://localhost:4000/update', toFormData(recipeChanges))
+            // Body is undefined???
+            let { data, status } = await axios.put('http://localhost:4000/update', recipeChanges, {
+                headers: {
+                    Authorization: idToken
+                }
+            })
 
-        if (status) {
-            console.log(data,status);
-            // data.ingredients = JSON.parse(data.ingredients)
+            if (status == 200 || status == 201) {
+                console.log(data, status);
+                window.location.reload()
+            }
 
+        } catch (error) {
 
         }
     }
+
+
+
 
     return (
 

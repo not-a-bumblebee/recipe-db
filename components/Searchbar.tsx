@@ -1,20 +1,23 @@
 'use client'
 
-import { useRef, useState } from "react"
-import { Input, CloseButton, Select, Group, TextInput, Button } from '@mantine/core';
+import { useRef} from "react"
+import { Select, Group, TextInput, Button, Anchor, Menu } from '@mantine/core';
 import { usePathname, useRouter } from "next/navigation";
-import { Form, useForm } from "@mantine/form";
+import { useAuthStore } from "@/app/store";
+import { auth } from "@/app/firebase";
 
 export default function SearchBar() {
-    // 0: by recipe name.   1: tag      2: both
-    const [searchOption, setSearchOption] = useState(0)
 
     const modeRef = useRef<HTMLInputElement>(null)
     const searchRef = useRef<HTMLInputElement>(null)
     const router = useRouter()
     const pathname = usePathname()
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
 
-    const submitSearch = (e) => {
+    const userCred = useAuthStore((state) => state.userCred)
+    const logoutUser = useAuthStore((state) => state.logoutUser)
+
+    const submitSearch = (e: React.SyntheticEvent) => {
         e.preventDefault()
         console.log("Submit");
 
@@ -32,9 +35,19 @@ export default function SearchBar() {
         }
     }
 
+    const searchCreator = async (name: string) => {
+        let nameField = `(${name})`
+        let toUrl = new URL(window.location.href)
+        toUrl.searchParams.set('mode', 'Mix')
+        toUrl.searchParams.set('query', nameField)
+
+        router.push("/search" + toUrl.search)
+
+    }
+
     return (
         <div className="w-full flex bg-slate-500 justify-between">
-            <h1>Louis Louis</h1>
+            <h1 onClick={() => router.push("/")}>Louis Louis</h1>
             <form onSubmit={submitSearch}>
                 <Group align="end" gap={0}>
 
@@ -52,8 +65,29 @@ export default function SearchBar() {
             </form>
 
             <div className="auth-ui">
-                <div>Sign up/in</div>
-                <div>Log Out</div>
+                {isLoggedIn && (
+                    <Menu trigger="hover" openDelay={100} closeDelay={400}>
+                        <Menu.Target>
+                            <Button>{userCred?.user?.displayName}</Button>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                            <Menu.Item component="button" onClick={() => searchCreator(userCred?.user?.displayName as string)} >
+                                Your Recipes
+                            </Menu.Item>
+                            <Menu.Item component="button" >
+                                Settings
+                            </Menu.Item>
+                            <Menu.Item onClick={auth.signOut} >
+                                Log Out
+                            </Menu.Item>
+                        </Menu.Dropdown>
+                    </Menu>
+                    // <Anchor href="/profile">{userCred?.user?.displayName}</Anchor>
+                )}
+
+                {!isLoggedIn && (
+                    <Anchor href="/auth/login">Sign In</Anchor>
+                )}
 
             </div>
 

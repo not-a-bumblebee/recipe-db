@@ -14,10 +14,12 @@ import { Dropzone } from '@mantine/dropzone';
 import CharacterCount from '@tiptap/extension-character-count';
 import axios, { toFormData } from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '../store';
 
 export default function Create() {
     const [files, setFiles] = useState<FileWithPath[]>([]);
-
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+    const userCred = useAuthStore((state) => state.userCred)
     interface FormValues {
         recipe_name: string,
         serving_size: string,
@@ -122,11 +124,11 @@ export default function Create() {
 
         // e.preventDefault()
         let temp = form.getValues()
-        let data ={
+        let data = {
             ...temp,
-            instructions:editor?.getHTML(),
-            file: files[0] ,
-
+            instructions: editor?.getHTML(),
+            file: files[0],
+            user_id: userCred?.user?.uid
         }
         // data.instructions = editor?.getHTML() as string
         // data.file = files[0] as any
@@ -141,11 +143,18 @@ export default function Create() {
 
         console.log(res);
 
-        if(res.status === 201){
-            router.push('/recipe/'+res.data.id)
+        if (res.status === 201) {
+            router.push('/recipe/' + res.data.id)
         }
-        
-        
+
+
+
+    }
+
+    if (!isLoggedIn) {
+        console.log("bazinga");
+
+        router.push("/")
 
     }
 
