@@ -16,22 +16,19 @@ export class RecipeController {
     return this.recipeService.getRecipe(id);
   }
 
-  @Get('/search/:mode/:query')
-  searchRecipes(@Param('mode') mode: string, @Param('query') query: string): Promise<Recipe[]> {
+  // @Get('/search/:mode/:query')
+  @Get('/search/:query')
+  searchRecipes(@Param('query') query: string): Promise<Recipe[]> {
     console.log("Searching");
 
     console.log(query);
-    console.log(mode);
+    // console.log(mode);
 
 
-    if (mode == 'Name')
-      return this.searchService.nameSearch(query)
-    else if (mode == 'Ingredient')
-      return this.searchService.tagSearch(query)
-    else
-      return this.searchService.mixSearch(query)
+
+    return this.searchService.mixSearch(query)
   }
-  
+
   @Post('/register')
   registerUser(@Body() body) {
     const { email, username, password } = body
@@ -45,7 +42,11 @@ export class RecipeController {
   @Post('/register/oauth')
   registerOAuth(@Body() body) {
     const { email, uid } = body
+    console.log("OAUTH Registering: ", email, uid);
+
     let userCred = this.authService.registerOAuth(email, uid)
+    return userCred
+
   }
 
   @Post('/user/update')
@@ -59,7 +60,11 @@ export class RecipeController {
 
   }
 
+  @Get('/examples')
+  getExamples (){
 
+    return this.searchService.exampleSearch()
+  }
 
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))

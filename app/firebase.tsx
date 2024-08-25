@@ -9,7 +9,8 @@ const firebaseConfig = {
     storageBucket: "recipe-db-finale.appspot.com",
     messagingSenderId: "228000467155",
     appId: "1:228000467155:web:678e777a2c3c909daaec26",
-    measurementId: "G-HYHQHYYWLB"
+    measurementId: "G-HYHQHYYWLB",
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -19,12 +20,20 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         console.log("User: ", user);
         // set/refresh idToken state in zustad after initialization
+        
         let idToken = await user.getIdToken()
         useAuthStore.getState().setIdToken(idToken)
+
+        useAuthStore.getState().loginUser(user)
+
+        // if registered through OAuth, redirect to set name
+        if (user.displayName) {
+
+        }
     }
     else {
         console.log("No Users ", user);
-        useAuthStore.getState().logoutUser()
+        useAuthStore?.persist?.clearStorage()
 
     }
 })

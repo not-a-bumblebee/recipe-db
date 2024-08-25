@@ -10,6 +10,7 @@ import RecipeComponent from "@/components/RecipeComponent"
 import RecipeForm from "@/components/RecipeForm"
 import { useAuthStore } from "@/app/store"
 import { auth } from "@/app/firebase";
+import CardLayout from "@/components/CardLayout"
 
 // [{
 //     name: string,
@@ -48,7 +49,7 @@ export default function RecipePage() {
     //     if (idToken != undefined) {
     //         let res = await auth.currentUser?.getIdTokenResult()
     //         console.log(res);
-            
+
     //     }
     //     console.log(idToken);
 
@@ -69,7 +70,7 @@ export default function RecipePage() {
     }
 
     const deleteRecipe = async () => {
-        let idToken = await userCred?.user?.getIdToken()
+        let idToken = await auth.currentUser?.getIdToken()
         let { data } = await axios.get('http://localhost:4000/recipe/' + params.id, { headers: { Authorization: idToken } })
 
         if (data) {
@@ -88,7 +89,7 @@ export default function RecipePage() {
 
     }, [])
     return (
-        <>
+        <CardLayout>
             <Flex
                 justify="center"
                 align="center"
@@ -103,7 +104,7 @@ export default function RecipePage() {
                                     (
                                         <>
                                             <RecipeComponent {...recipe} />
-                                            {(isLoggedIn != null && userCred?.user?.uid === recipe.user_id) && (
+                                            {(isLoggedIn != null && userCred?.uid === recipe.user_id) && (
 
                                                 <Menu>
                                                     <Menu.Target>
@@ -144,7 +145,7 @@ export default function RecipePage() {
 
                 </Paper>
             </Flex>
-        </>
+        </CardLayout>
 
     )
 }

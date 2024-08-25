@@ -1,5 +1,5 @@
 "use client"
-import { Button, TextInput } from "@mantine/core";
+import { Button, TextInput, UnstyledButton } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { auth } from "@/app/firebase";
 import axios, { AxiosError, toFormData } from "axios";
@@ -8,6 +8,7 @@ import 'firebase/auth'
 import { useAuthStore } from "@/app/store";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useEffect } from "react";
 
 interface LoginForm {
     email: string,
@@ -19,6 +20,7 @@ interface RegisterForm extends LoginForm {
 export default function RegisterPage() {
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
     const loginUser = useAuthStore((state) => state.loginUser)
+    const _hasHydrated = useAuthStore((state) => state._hasHydrated)
     const router = useRouter()
 
     const registerForm = useForm<RegisterForm>({
@@ -52,7 +54,7 @@ export default function RegisterPage() {
             if (res.status == 200 || res.status == 201) {
                 let userCred = await signInWithEmailAndPassword(auth, data.email, data.password);
                 console.log(userCred);
-                loginUser(userCred)
+                loginUser(userCred.user)
                 router.push("/")
             }
 
@@ -75,10 +77,13 @@ export default function RegisterPage() {
 
     }
 
-    if (isLoggedIn) {
-        router.push("/")
+    useEffect(() => {
+        console.log(isLoggedIn);
 
-    }
+        if (isLoggedIn && _hasHydrated) {
+            router.push("/")
+        }
+    }, [_hasHydrated, isLoggedIn])
 
     return (
         <form onSubmit={registerForm.onSubmit(registerUser)}>
@@ -86,6 +91,10 @@ export default function RegisterPage() {
             <TextInput label='email'  {...registerForm.getInputProps(`email`)}></TextInput>
             <TextInput label='username' {...registerForm.getInputProps(`username`)}></TextInput>
             <TextInput type="password" label='password' {...registerForm.getInputProps(`password`)}></TextInput>
+            <UnstyledButton mt={7}>
+                <img src="/google.svg" className="h-fit" alt="continue with google" />
+            </UnstyledButton>
+            <br />
             <Button type="submit">register</Button>
         </form>
     )

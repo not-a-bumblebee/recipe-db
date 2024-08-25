@@ -1,36 +1,36 @@
 'use client'
 
-import { useRef} from "react"
-import { Select, Group, TextInput, Button, Anchor, Menu } from '@mantine/core';
-import { usePathname, useRouter } from "next/navigation";
+import { useRef, useState } from "react"
+import { Select, Group, TextInput, Button, Anchor, Menu, Tooltip, Flex, ActionIcon } from '@mantine/core';
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/app/store";
 import { auth } from "@/app/firebase";
 
 export default function SearchBar() {
 
-    const modeRef = useRef<HTMLInputElement>(null)
-    const searchRef = useRef<HTMLInputElement>(null)
+    // const modeRef = useRef<HTMLInputElement>(null)
+    // const searchRef = useRef<HTMLInputElement>(null)
+    const searchParams = useSearchParams()
+    const query = searchParams.get("query")
     const router = useRouter()
-    const pathname = usePathname()
+    const [inputQuery, setInputQuery] = useState(query ?? "")
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
 
     const userCred = useAuthStore((state) => state.userCred)
-    const logoutUser = useAuthStore((state) => state.logoutUser)
 
     const submitSearch = (e: React.SyntheticEvent) => {
         e.preventDefault()
         console.log("Submit");
 
-        let params = new URLSearchParams()
-        if (modeRef.current !== null || searchRef.current !== null && searchRef.current.value.length > 0) {
+        if (inputQuery !== null && inputQuery.length > 0) {
 
             let toUrl = new URL(window.location.href)
-            toUrl.searchParams.set('mode', modeRef.current?.value as string)
-            toUrl.searchParams.set('query', searchRef.current?.value as string)
+            // toUrl.searchParams.set('mode', modeRef.current?.value as string)
+            toUrl.searchParams.set('query', inputQuery)
             console.log(toUrl);
             console.log(toUrl.searchParams.get('query'));
 
-            router.refresh()
+
             router.push("/search" + toUrl.search)
         }
     }
@@ -38,28 +38,46 @@ export default function SearchBar() {
     const searchCreator = async (name: string) => {
         let nameField = `(${name})`
         let toUrl = new URL(window.location.href)
-        toUrl.searchParams.set('mode', 'Mix')
         toUrl.searchParams.set('query', nameField)
 
         router.push("/search" + toUrl.search)
 
     }
 
+
+
     return (
-        <div className="w-full flex bg-slate-500 justify-between">
-            <h1 onClick={() => router.push("/")}>Louis Louis</h1>
+        <div className="w-full flex bg-slate-500 justify-between items-center px-5">
+            <h1 className="font-mono cursor-pointer" onClick={() => router.push("/")}>Recipe-DB</h1>
+
             <form onSubmit={submitSearch}>
-                <Group align="end" gap={0}>
+                <Group align="center" gap={0}>
+                    <Tooltip label={
+                        <div>
+                            <h2>Instructions</h2>
+                            <p>
+                                ingredients:    soft_water
+                            </p>
+                            <p>recipe name: "apple pie"</p>
+                            <p>username: (tom)</p>
+                            <p>All together: "Apple Pie" apples sugar brown_sugar (Agatha)</p>
+                        </div>}
+                        multiline w={500}>
 
-                    <Select w={120} ref={modeRef} label='Search Mode' data={['Name', 'Ingredient', 'Mix']} defaultValue={'Name'} />
-                    <TextInput ref={searchRef} placeholder="" rightSection={
-                        <Button type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 mr-4 cursor-pointer">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg>
+                    </Tooltip>
 
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                        </Button>
-                    }
+                    {/* {    <Select w={120} ref={modeRef} label='Search Mode' data={['Name', 'Ingredient', 'Mix']} defaultValue={'Name'} />} */}
+                    <TextInput radius={'xl'} placeholder="Search" rightSectionWidth={42} value={inputQuery} onChange={(event) => setInputQuery(event.currentTarget.value)}
+                        rightSection={
+                            <ActionIcon size={32} radius={'xl'} >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                </svg>
+                            </ActionIcon>
+                        }
                     />
                 </Group>
             </form>
@@ -68,21 +86,20 @@ export default function SearchBar() {
                 {isLoggedIn && (
                     <Menu trigger="hover" openDelay={100} closeDelay={400}>
                         <Menu.Target>
-                            <Button>{userCred?.user?.displayName}</Button>
+                            <Button>{userCred?.displayName}</Button>
                         </Menu.Target>
                         <Menu.Dropdown>
-                            <Menu.Item component="button" onClick={() => searchCreator(userCred?.user?.displayName as string)} >
+                            <Menu.Item component="button" onClick={() => searchCreator(userCred?.displayName as string)} >
                                 Your Recipes
                             </Menu.Item>
-                            <Menu.Item component="button" >
+                            <Menu.Item component="button" onClick={() => router.push("/settings")}>
                                 Settings
                             </Menu.Item>
-                            <Menu.Item onClick={auth.signOut} >
+                            <Menu.Item onClick={async () => auth.signOut()} >
                                 Log Out
                             </Menu.Item>
                         </Menu.Dropdown>
                     </Menu>
-                    // <Anchor href="/profile">{userCred?.user?.displayName}</Anchor>
                 )}
 
                 {!isLoggedIn && (

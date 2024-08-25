@@ -4,15 +4,18 @@ import { FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { randomId } from '@mantine/hooks';
 import { RichTextEditor } from '@mantine/tiptap';
-import TextAlign from '@tiptap/extension-text-align';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import React, { useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import CharacterCount from '@tiptap/extension-character-count';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
 import axios, { toFormData } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/app/store';
+import Tiptap from './Tiptap';
+
 interface FormValues {
     recipe_name: string,
     serving_size: string,
@@ -46,7 +49,6 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
 
     let content = instructions ?? ''
-    const first = useRef(null)
 
     const form = useForm<FormValues>({
         mode: 'uncontrolled',
@@ -82,6 +84,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
     const editor = useEditor({
         extensions: [
             StarterKit,
+            Underline,
             CharacterCount.configure({
                 limit,
             }),
@@ -310,44 +313,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
                             {form.errors.instructions}
                         </Text>
                     )}
-                    <RichTextEditor ref={first} className='bg-slate-300' onInput={(x) => { console.log(x) }} autoCorrect={"False"} editor={editor}>
-                        <RichTextEditor.Toolbar sticky stickyOffset={60} >
-
-                            <RichTextEditor.ControlsGroup>
-                                <RichTextEditor.Bold />
-                                <RichTextEditor.Italic />
-                                <RichTextEditor.Underline />
-                                <RichTextEditor.Strikethrough />
-                                <RichTextEditor.ClearFormatting />
-                                <RichTextEditor.Highlight />
-                                <RichTextEditor.Code />
-                            </RichTextEditor.ControlsGroup>
-
-                            <RichTextEditor.ControlsGroup>
-                                <RichTextEditor.H1 />
-                                <RichTextEditor.H2 />
-                                <RichTextEditor.H3 />
-                                <RichTextEditor.H4 />
-                            </RichTextEditor.ControlsGroup>
-
-                            <RichTextEditor.ControlsGroup>
-                                <RichTextEditor.Blockquote />
-                                <RichTextEditor.Hr />
-                                <RichTextEditor.BulletList />
-                                <RichTextEditor.OrderedList />
-                                <RichTextEditor.Subscript />
-                                <RichTextEditor.Superscript />
-                            </RichTextEditor.ControlsGroup>
-                            <RichTextEditor.ControlsGroup>
-                                <RichTextEditor.AlignLeft />
-                                <RichTextEditor.AlignCenter />
-                                <RichTextEditor.AlignJustify />
-                                <RichTextEditor.AlignRight />
-                            </RichTextEditor.ControlsGroup>
-                        </RichTextEditor.Toolbar>
-                        <RichTextEditor.Content />
-                        {editor?.storage.characterCount.characters()} / {limit} characters
-                    </RichTextEditor>
+                    <Tiptap editor={editor} limit={limit} />
                 </Input.Wrapper>
             </div>
 

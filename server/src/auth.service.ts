@@ -38,6 +38,8 @@ export class AuthService {
             })
             return prismaUser
         } catch (error) {
+            console.error("Error during OAuth syncing",error);
+            
         }
     }
 
@@ -123,7 +125,7 @@ export class AuthService {
     async loginUser() {
 
     }
-    async deleteUser(uid, deleteRecipes) {
+    async deleteUser(uid) {
         this.firebaseService.auth.deleteUser(uid)
         // TODO CASCADE DELETE
         this.prisma.user.delete({ where: { id: uid } })

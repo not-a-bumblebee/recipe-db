@@ -139,7 +139,7 @@ export class RecipeService {
     // upsert the new ingredient_tags
     // delete any strays
     const { id, ...changes } = body
-    
+
     let ingredientChanges = []
 
     if (changes?.ingredients) {
@@ -183,7 +183,7 @@ export class RecipeService {
     console.log("Changes:" + changes);
     console.log(typeof id);
 
-console.log(changes.ingredients ? ingredientChanges : null);
+    console.log(changes.ingredients ? ingredientChanges : null);
 
 
     const [updateRes, deleteRes, recipeTagRes] = await this.prisma.$transaction([
@@ -207,10 +207,16 @@ console.log(changes.ingredients ? ingredientChanges : null);
     return updateRes
   }
 
-  async deleteRecipe(): Promise<void> {
+  async deleteRecipe(id, uid): Promise<void> {
 
     this.deleteStrayTags()
-    return
+
+    let target = await this.prisma.recipe.delete({
+      where: {
+        id
+      }
+    })
+    
   }
 
   searchRecipe(): string {

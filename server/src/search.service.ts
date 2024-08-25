@@ -60,6 +60,18 @@ export class SearchService {
 
         return res
     }
+    async exampleSearch() {
+        return await this.prisma.recipe.findMany({
+            take: 5,
+            include: {
+                creator: {
+                    select: {
+                        username: true
+                    }
+                }
+            }
+        })
+    }
     async mixSearch(query: string) {
         // \b(?<!-|"|')\w+(?!"|')\b get included tags minus recipe names
         let searchRName = query.match(/(?<="|')[a-zA-Z0-9_ ]+(?="|')/g)
@@ -129,11 +141,11 @@ export class SearchService {
                 },
                 include: {
                     creator: {
-                      select: {
-                        username: true
-                      }
+                        select: {
+                            username: true
+                        }
                     }
-                  }
+                }
             });
         console.log(res);
 
