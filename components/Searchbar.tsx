@@ -70,11 +70,9 @@ export default function SearchBar() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                         </svg>
                     </Tooltip>
-
-                    {/* {    <Select w={120} ref={modeRef} label='Search Mode' data={['Name', 'Ingredient', 'Mix']} defaultValue={'Name'} />} */}
                     <TextInput radius={'xl'} placeholder="Search" rightSectionWidth={42} value={inputQuery} onChange={(event) => setInputQuery(event.currentTarget.value)}
                         rightSection={
-                            <ActionIcon size={32} radius={'xl'} >
+                            <ActionIcon type="submit" size={32} radius={'xl'} >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="size-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                 </svg>

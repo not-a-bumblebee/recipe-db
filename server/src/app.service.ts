@@ -1,9 +1,8 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid'
-import { create } from 'domain';
 import { Recipe } from '@prisma/client';
 
 
@@ -215,7 +214,7 @@ export class RecipeService {
         id
       }
     })
-    
+
     await this.deleteImage(target.image_url)
 
     await this.deleteStrayTags()

@@ -1,11 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images:{
-        remotePatterns:[
+    output: 'export',
+    images: {
+        remotePatterns: [
             {
-                protocol:'https',
-                hostname:'d1p9uf8cei0o4.cloudfront.net',
-                
+                protocol: 'https',
+                hostname: 'd1p9uf8cei0o4.cloudfront.net',
+
             }
         ]
     }
