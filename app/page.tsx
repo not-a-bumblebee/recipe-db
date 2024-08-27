@@ -8,9 +8,8 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
-  const loginUser = useAuthStore((state) => state.loginUser)
   const router = useRouter()
-  console.log(isLoggedIn);
+  // console.log(isLoggedIn);
 
   const [examples, setExamples] = useState([])
 
@@ -37,11 +36,16 @@ export default function Home() {
 
 
   const fetchRecipes = async () => {
-    let { data } = await axios.get('http://localhost:4000/examples')
-    console.log(data);
+    try {
 
-    const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)
-    setExamples(cardResults)
+      let { data } = await axios.get('http://localhost:4000/examples')
+      // console.log(data);
+
+      const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)
+      setExamples(cardResults)
+    } catch (error) {
+      console.error(error)
+    }
 
   }
 
@@ -56,12 +60,13 @@ export default function Home() {
       <Flex ff={"monospace"} bg={"#90d5ff"} p={15} className="rounded-sm shadow-2xl" >
         <div>
           <h2>Search Instructions</h2>
+          <b>Types of Tags</b>
           <p>
-            ingredients:    soft_water
+            <b>  ingredient:</b>    brown_sugar
           </p>
-          <p>recipe name: "apple pie"</p>
-          <p>username: (tom)</p>
-          <p>All together: "Apple Pie" apples sugar brown_sugar (Agatha)</p>
+          <p><b>recipe name</b> "apple pie"</p>
+          <p><b>username:</b> (tom)</p>
+          <p><b>Final Example:</b> "apple Pie" apples sugar brown_sugar (tom)</p>
         </div>
       </Flex>
       <Flex wrap={"wrap"} gap={"xs"} >

@@ -42,8 +42,6 @@ export class AuthGuard implements CanActivate {
             throw new UnauthorizedException();
         }
         try {
-            console.log("bazinga");
-
             let res = await this.firebaseService.auth.verifyIdToken(token)
             console.log("Token: ", res);
 

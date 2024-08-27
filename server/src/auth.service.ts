@@ -5,19 +5,17 @@ import { initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import admin from 'firebase-admin'
 import { FirebaseService } from "./firebase.service";
+import { S3Client } from "@aws-sdk/client-s3";
+import { RecipeService } from "./app.service";
 
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private readonly configService: ConfigService, private readonly firebaseService:FirebaseService) { }
+    constructor(private prisma: PrismaService, private readonly configService: ConfigService, private readonly firebaseService: FirebaseService, private readonly recipeService: RecipeService) { }
 
-    // private readonly firebaseConfig = {
-    //     credential: admin.credential.cert(JSON.parse(this.configService.getOrThrow('FIRE_ADMIN')))
-    // }
-
-    // private readonly app = initializeApp(this.firebaseConfig)
-
-    // private readonly auth = getAuth(this.app)
+    private readonly s3Client = new S3Client({
+        region: this.configService.getOrThrow('AWS_S3_REGION')
+    })
 
     async availableEmail(email) {
         let validEmail = await this.prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } })
@@ -38,13 +36,19 @@ export class AuthService {
             })
             return prismaUser
         } catch (error) {
-            console.error("Error during OAuth syncing",error);
-            
+            console.error("Error during OAuth syncing", error);
+
         }
     }
 
     async updateUsername(username, uid) {
         try {
+            let validUsername = await this.availableUsername(username)
+
+            if (!validUsername) {
+                throw "invalid username"
+            }
+
             await this.prisma.user.update({
                 where: {
                     firebase_id: uid
@@ -53,7 +57,7 @@ export class AuthService {
                     username
                 }
             })
-            
+
             await this.firebaseService.auth.updateUser(uid, {
                 displayName: username
             })
@@ -69,7 +73,7 @@ export class AuthService {
 
 
     }
-    
+
     async registerNormal(email, username, password) {
         let validEmail = await this.availableEmail(email)
         let validUsername = await this.availableUsername(username)
@@ -122,13 +126,23 @@ export class AuthService {
         }
 
     }
-    async loginUser() {
 
+    // delete firebase_data => get everysingle post -> iterate,and delete the s3 image 
+    //  -> delete user when done (the cascade will delete the recipes)
+    async deleteUser({ uid }) {
+
+        let targets = await this.prisma.recipe.findMany({ where: { user_id: uid } })
+
+        let imageDeletions = targets.map(x => {
+            return this.recipeService.deleteImage(x.image_url)
+        })
+        await Promise.all(imageDeletions)
+
+        await this.firebaseService.auth.deleteUser(uid)
+        await this.prisma.user.delete({ where: { firebase_id: uid } })
+
+        await this.recipeService.deleteStrayTags()
     }
-    async deleteUser(uid) {
-        this.firebaseService.auth.deleteUser(uid)
-        // TODO CASCADE DELETE
-        this.prisma.user.delete({ where: { id: uid } })
-    }
-    async forgotCreds() { }
+
+
 }

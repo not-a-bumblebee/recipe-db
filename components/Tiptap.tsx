@@ -11,7 +11,7 @@ export default function Tiptap({ editor, limit }: TiptapProps) {
 
     return (
 
-        <RichTextEditor className='bg-slate-300' onInput={(x) => { console.log(x) }} autoCorrect={"False"} editor={editor}>
+        <RichTextEditor className='bg-slate-300' autoCorrect={"False"} editor={editor}>
             <RichTextEditor.Toolbar sticky stickyOffset={60} >
 
                 <RichTextEditor.ControlsGroup>

@@ -18,7 +18,8 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        console.log("User: ", user);
+        // console.log("User: ", user);
+
         // set/refresh idToken state in zustad after initialization
         
         let idToken = await user.getIdToken()
@@ -26,13 +27,10 @@ onAuthStateChanged(auth, async (user) => {
 
         useAuthStore.getState().loginUser(user)
 
-        // if registered through OAuth, redirect to set name
-        if (user.displayName) {
-
-        }
     }
     else {
-        console.log("No Users ", user);
+        // console.log("No Users ", user);
+        // resets the zustand data
         useAuthStore?.persist?.clearStorage()
 
     }

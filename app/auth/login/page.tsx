@@ -1,15 +1,15 @@
 "use client"
 
-import { Button, TextInput, UnstyledButton } from "@mantine/core";
-import { isEmail, useForm } from "@mantine/form";
-import axios, { toFormData } from "axios";
-import firebase from "firebase/compat/app";
+import { Button, Flex, TextInput, UnstyledButton } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import axios from "axios";
 import 'firebase/auth'
 import { getAdditionalUserInfo, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/app/store";
 import { useRouter } from "next/navigation";
 import { auth } from "@/app/firebase";
+import CardLayout from "@/components/CardLayout";
 interface LoginForm {
     email: string,
     password: string
@@ -23,6 +23,9 @@ export default function LoginPage() {
     const loginUser = useAuthStore((state) => state.loginUser)
     const _hasHydrated = useAuthStore((state) => state._hasHydrated)
     const setPesterUsername = useAuthStore((state) => state.setPesterUsername)
+    const pesterUsername = useAuthStore((state) => state.pesterUsername)
+    const userCreds = useAuthStore((state) => state.userCred)
+
 
     const router = useRouter()
 
@@ -38,18 +41,18 @@ export default function LoginPage() {
             password: (value) => (value.length < 6 ? 'Name must have at least 6 characters' : null),
         },
     });
-    // useEffect(() => {
-    //     console.log(isLoggedIn);
+    useEffect(() => {
+        // console.log(isLoggedIn);
 
-    //     if (isLoggedIn && _hasHydrated) {
-    //         router.push("/")
-    //     }
-    // }, [_hasHydrated, isLoggedIn])
+        if (isLoggedIn && _hasHydrated && userCreds?.displayName != 'anonymouse' && !pesterUsername) {
+            router.push("/")
+        }
+    }, [_hasHydrated, isLoggedIn, pesterUsername])
 
 
     const loginEmail = async () => {
         let data = loginForm.getValues()
-        console.log(data);
+        // console.log(data);
 
         // let res = await axios.post('http://localhost:4000/login', toFormData(data))
         try {
@@ -64,27 +67,30 @@ export default function LoginPage() {
     }
     // what happens if the associated email is already registered?
     const loginGoogle = async () => {
-        let data = loginForm.getValues()
+        try {
 
-        let userCred = await signInWithPopup(auth, new GoogleAuthProvider())
-        if (auth.currentUser) {
-            updateProfile(auth.currentUser, {
-                displayName: "anonymouse"
-            })
-        }
+            let userCred = await signInWithPopup(auth, new GoogleAuthProvider())
+            if (auth.currentUser) {
+                updateProfile(auth.currentUser, {
+                    displayName: "anonymouse"
+                })
+            }
 
-        console.log(userCred);
-        let bonusCred = getAdditionalUserInfo(userCred)
-        console.log(bonusCred);
-        // adds them to our user db if new
-        if (bonusCred?.isNewUser) {
-            let res = await axios.post('http://localhost:4000/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
-            console.log("OAUTH REGISTERING",res);
+            // console.log(userCred);
+            let bonusCred = getAdditionalUserInfo(userCred)
+            // console.log(bonusCred);
+            // adds them to our user db if new
+            if (bonusCred?.isNewUser) {
+                let res = await axios.post('http://localhost:4000/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
+                // console.log("OAUTH REGISTERING", res);
 
-            setPesterUsername(true)
-            // redirect to ask for username when done
-            // loginUser(userCred)
-            // router.push("/")
+                setPesterUsername(true)
+                // redirect to ask for username when done
+                // loginUser(userCred)
+                router.push("/settings")
+            }
+        } catch (error) {
+            console.error(error)
         }
     }
 
@@ -93,7 +99,7 @@ export default function LoginPage() {
 
 
     return (
-        <>
+        <CardLayout>
             <form onSubmit={loginForm.onSubmit(loginEmail)}>
 
                 <h2>Sign In </h2>
@@ -103,11 +109,14 @@ export default function LoginPage() {
                 <UnstyledButton mt={7} onClick={loginGoogle}>
                     <img src="/google.svg" alt="continue with google" />
                 </UnstyledButton>
+                <div className="mt-5 ml-5">
+                    <UnstyledButton c="#6900ff" onClick={() => router.push('/auth/register')}>sign up</UnstyledButton>
+                </div>
                 <br />
-                <Button type="submit">Login </Button>
+                <Flex justify={"flex-end"}>
+                    <Button type="submit">Login </Button>
+                </Flex>
             </form>
-
-
-        </>
+        </CardLayout>
     )
 }

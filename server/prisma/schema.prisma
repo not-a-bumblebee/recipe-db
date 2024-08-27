@@ -19,7 +19,6 @@ model User{
   firebase_id String @unique
   username String? @default("anonymouse")
   email String @unique
-  // pw String
   recipes Recipe[]
 }
 
@@ -29,7 +28,7 @@ model Recipe{
   duration String
   serving_size String
   ingredients String
-  creator User @relation(fields: [user_id], references: [firebase_id])
+  creator User @relation(fields: [user_id], references: [firebase_id], onDelete: Cascade)
   user_id String
   image_url String
   instructions String

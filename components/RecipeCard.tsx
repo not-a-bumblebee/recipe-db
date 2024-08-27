@@ -24,7 +24,6 @@ interface RecipeType {
 
 export default function RecipeCard({ id, duration, image_url, ingredients, recipe_name, serving_size, user_id, creator }: RecipeType) {
 
-    console.log(creator);
 
     const router = useRouter()
     const searchCreator = async (name: string) => {
@@ -58,7 +57,6 @@ export default function RecipeCard({ id, duration, image_url, ingredients, recip
             </Group>
             <Title fw={400} order={3}>Ingredients: </Title>
             <Spoiler maxHeight={70} showLabel="Show More" hideLabel="Hide">
-
                 <Group>
                     {parsedIngredients.map((x: IngredientType) =>
                         <Badge key={x.name} color="blue">{x.name}</Badge>

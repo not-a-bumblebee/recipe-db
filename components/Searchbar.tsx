@@ -27,8 +27,8 @@ export default function SearchBar() {
             let toUrl = new URL(window.location.href)
             // toUrl.searchParams.set('mode', modeRef.current?.value as string)
             toUrl.searchParams.set('query', inputQuery)
-            console.log(toUrl);
-            console.log(toUrl.searchParams.get('query'));
+            // console.log(toUrl);
+            // console.log(toUrl.searchParams.get('query'));
 
 
             router.push("/search" + toUrl.search)
@@ -47,21 +47,23 @@ export default function SearchBar() {
 
 
     return (
-        <div className="w-full flex bg-slate-500 justify-between items-center px-5">
+        <div className="w-full flex bg-[#c1ebad] justify-between items-center px-5">
             <h1 className="font-mono cursor-pointer" onClick={() => router.push("/")}>Recipe-DB</h1>
 
             <form onSubmit={submitSearch}>
                 <Group align="center" gap={0}>
                     <Tooltip label={
                         <div>
-                            <h2>Instructions</h2>
+                            <h2>Search Instructions</h2>
+                            <b>Types of Tags</b>
                             <p>
-                                ingredients:    soft_water
+                                <b>  ingredient:</b>    brown_sugar
                             </p>
-                            <p>recipe name: "apple pie"</p>
-                            <p>username: (tom)</p>
-                            <p>All together: "Apple Pie" apples sugar brown_sugar (Agatha)</p>
-                        </div>}
+                            <p><b>recipe name</b> "apple pie"</p>
+                            <p><b>username:</b> (tom)</p>
+                            <p><b>Final Example:</b> "apple Pie" apples sugar brown_sugar (tom)</p>
+                        </div>
+                    }
                         multiline w={500}>
 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 mr-4 cursor-pointer">

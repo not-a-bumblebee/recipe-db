@@ -12,7 +12,7 @@ export default function CardLayout({ children }: CardLayoutProp) {
             align="center"
             direction="column"
             my={'4rem'}>
-            <Paper shadow="xl" p="xl" w={"40%"} withBorder className="relative" >
+            <Paper shadow="xl" p="xl"   withBorder className="paper-layout relative" >
                 {children}
             </Paper>
         </Flex>

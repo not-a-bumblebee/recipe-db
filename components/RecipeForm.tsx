@@ -1,12 +1,11 @@
 'use client'
-import { TextInput, NumberInput, Select, Button, Flex, Group, Paper, BackgroundImage, Text, Input } from '@mantine/core';
+import { TextInput, Button, Flex, Group, BackgroundImage, Text, Input } from '@mantine/core';
 import { FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { isNotEmpty, useForm } from '@mantine/form';
-import { randomId } from '@mantine/hooks';
 import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import CharacterCount from '@tiptap/extension-character-count';
 import TextAlign from '@tiptap/extension-text-align';
@@ -40,9 +39,6 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
     const [files, setFiles] = useState<FileWithPath[]>([]);
     const userCred = useAuthStore((state) => state.userCred)
     const idToken = useAuthStore((state) => state.idToken)
-
-    console.log(duration, image_url, ingredients, instructions, recipe_name, serving_size);
-
 
 
     const router = useRouter()
@@ -80,7 +76,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
         },
     });
-    const limit = 2000
+    const limit = 2500
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -101,14 +97,14 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
 
     const fields = form.values.ingredients.map((item, index) => (
-        <Group key={item.name + index} mt="xs" align='center'>
+        <Group key={item.name + index} my="xs" align='center'>
             <TextInput
                 label="Ingredient Name"
                 placeholder="paprika"
                 {...form.getInputProps(`ingredients.${index}.name`)}
 
             />
-            <TextInput label="Quant" {...form.getInputProps(`ingredients.${index}.quantity`)} />
+            <TextInput placeholder='1 tsp' label="Quantity" {...form.getInputProps(`ingredients.${index}.quantity`)} />
 
 
 
@@ -122,67 +118,53 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
         </Group>
     ))
 
-    const previews = () => {
-        const imageUrl = image_url ?? URL.createObjectURL(files[0]);
-        return <BackgroundImage className=" absolute  z-0 hover:opacity-40  top-0 right-0 w-full h-full" src={image_url ?? URL.createObjectURL(files[0])} />
-    };
 
 
-    console.log(form.values, files);
 
     const postRecipe = async () => {
-        console.log("Submitting Form");
-
-        // console.log(e);
-
-        // e.preventDefault()
-        let temp = form.getValues()
-        let data = {
-            ...temp,
-            instructions: editor?.getHTML(),
-            file: files[0],
-
-        }
-        // data.instructions = editor?.getHTML() as string
-        // data.file = files[0] as any
-        delete data.files
-
-        // let outData = FormData(form.values)
+        try {
 
 
-        console.log("Sending: ", data);
+            console.log("Submitting Form");
 
-        let res = await axios.post('http://localhost:4000', toFormData(data))
+            // console.log(e);
 
-        console.log(res);
+            // e.preventDefault()
+            let temp = form.getValues()
+            let data = {
+                ...temp,
+                instructions: editor?.getHTML(),
+                file: files[0],
+                user_id: userCred?.uid
+            }
 
-        if (res.status === 201) {
-            router.push('/recipe/' + res.data.id)
+            delete data.files
+
+
+            console.log("Sending: ", data);
+
+            let res = await axios.post('http://localhost:4000/create', toFormData(data))
+
+            console.log(res);
+
+            if (res.status === 201) {
+                router.push('/recipe/' + res.data.id)
+            }
+        } catch (error) {
+            console.error(error)
         }
     }
 
     const editRecipe = async () => {
         try {
-
-
             // check for differences
             let ingrChanges = false
             let recipeForm = form.getValues()
-            // let recipeData = {
-            //     ...(recipeForm.duration.trim() != duration && { duration: recipeForm.duration.trim() }),
-            //     ...(files.length > 0 && { file: files[0] }),
-            //     ingredients,
-            //     ...(editor?.getHTML() != instructions && { instructions: editor?.getHTML() }),
-            //     ...(recipeForm.recipe_name.trim() != recipe_name && { recipe_name: recipeForm.recipe_name.trim() }),
-            //     ...(recipeForm.serving_size.trim() != serving_size && { serving_size: recipeForm.serving_size.trim() }),
-            //     recipe_id
-            // }
-            // if ingredients are different set ingrChanges to true
+
 
             if (ingredients) {
                 if (ingredients.length != recipeForm.ingredients.length) {
                     ingrChanges = true
-
                 }
                 if (!ingrChanges) {
                     for (let i = 0; i < recipeForm.ingredients.length; i++) {
@@ -212,9 +194,6 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
             console.log("Recipe Changes: ", recipeChanges);
 
-            // let idToken = await userCred?.user?.getIdToken()
-
-            // Body is undefined???
             let { data, status } = await axios.put('http://localhost:4000/update', recipeChanges, {
                 headers: {
                     Authorization: idToken
@@ -227,16 +206,12 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
             }
 
         } catch (error) {
-
+            console.error(error)
         }
     }
 
 
-
-
     return (
-
-
 
         <form onSubmit={form.onSubmit(editMode ? editRecipe : postRecipe)}>
             <Flex
@@ -263,7 +238,6 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
                         <Text size="sm" c="dimmed" inline mt={7}>
                             Attach a photo size limit of 30mb
                         </Text>
-                        {/* {<BackgroundImage className=" absolute  z-0 hover:opacity-40  top-0 right-0 w-full h-full" src={image_url ?? URL.createObjectURL(files[0])} />} */}
                     </Group>}
                     {files.length != 0 && <BackgroundImage className=" absolute  z-0 hover:opacity-40  top-0 right-0 w-full h-full" src={image_url ?? URL.createObjectURL(files[0])} />}
                 </Dropzone>
@@ -318,8 +292,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
             </div>
 
             <div className='create-btns'>
-                <Button color='red' onClick={() => console.log(editor?.getHTML())
-                }>
+                <Button color='red' onClick={() => router.back()}>
                     Cancel
                 </Button>
                 <Button type='submit'>

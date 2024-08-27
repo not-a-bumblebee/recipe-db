@@ -13,17 +13,14 @@ export class RecipeController {
 
   @Get('/recipe/:id')
   getRecipe(@Param('id') id: string): Promise<Recipe> {
+    console.log("Getting Recipe #", id);
+
     return this.recipeService.getRecipe(id);
   }
 
-  // @Get('/search/:mode/:query')
   @Get('/search/:query')
   searchRecipes(@Param('query') query: string): Promise<Recipe[]> {
-    console.log("Searching");
-
-    console.log(query);
-    // console.log(mode);
-
+    console.log("Searching for recipe with query: ", query);
 
 
     return this.searchService.mixSearch(query)
@@ -32,13 +29,16 @@ export class RecipeController {
   @Post('/register')
   registerUser(@Body() body) {
     const { email, username, password } = body
+    console.log("Registering a new user");
+
     console.log(body);
 
     let userCred = this.authService.registerNormal(email.trim(), username, password)
 
-
     return userCred
   }
+
+
   @Post('/register/oauth')
   registerOAuth(@Body() body) {
     const { email, uid } = body
@@ -46,25 +46,30 @@ export class RecipeController {
 
     let userCred = this.authService.registerOAuth(email, uid)
     return userCred
-
   }
 
   @Post('/user/update')
   @UseGuards(AuthGuard)
   setUsername(@Body() body) {
     const { username, uid } = body
+    console.log("Updating Username");
+    console.log("Desired Username: ", username);
 
 
     let userCred = this.authService.updateUsername(username, uid)
 
-
+    return userCred
   }
 
+
   @Get('/examples')
-  getExamples (){
+  getExamples() {
+    console.log("Fetching examples");
+    
 
     return this.searchService.exampleSearch()
   }
+
 
   @Post('/create')
   @UseInterceptors(FileInterceptor('file'))
@@ -74,21 +79,15 @@ export class RecipeController {
     })
   ) file: Express.Multer.File): Promise<Recipe> {
     // Check if img meets specs, and if user is logged in.
-    console.log("Posting");
+    console.log("Submitting New Recipe");
     console.log(body);
     console.log(file);
-
-
-    // console.log(typeof body.files[0]);
-
-
-
 
 
     return this.recipeService.postRecipe(body, file);
   }
 
-  // body should also contain some user token.
+
   @Put('/update')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
@@ -99,38 +98,38 @@ export class RecipeController {
     })
   ) file: Express.Multer.File) {
     // Check if img meets specs, and if user is logged in.
-    console.log("updating");
+    console.log("updating recipe");
     console.log(body);
     console.log(file);
 
-
     body.id = parseInt(body.id)
 
-    // console.log(typeof body.files[0]);
-
-
-
-
-    // Promise<Recipe>
     return this.recipeService.updateRecipe(body, file);
-    // return "bonojour"
+
   }
 
-  @Delete()
+
+  @Delete('/recipe')
   @UseGuards(AuthGuard)
-  deleteRecipe(@Body() body): Promise<Recipe> {
-    // Check if img meets specs, and if user is logged in.
+  deleteRecipe(@Body() body): Promise<void> {
+    console.log("Deleting recipe");
+
+    console.log(body);
+
+    return this.recipeService.deleteRecipe(body);
+
+  }
 
 
+  @Delete('/user')
+  @UseGuards(AuthGuard)
+  deleteUser(@Body() body): Promise<void> {
+    console.log("Deleting User");
 
-    // console.log(typeof body.files[0]);
+    console.log(body);
 
+    return this.authService.deleteUser(body);
 
-
-
-
-    // return this.recipeService.deleteRecipe(body);
-    return
   }
 
 }

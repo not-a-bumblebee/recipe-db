@@ -6,10 +6,19 @@ import { PrismaService } from './prisma.service';
 import { SearchService } from './search.service';
 import { AuthService } from './auth.service';
 import { FirebaseService } from './firebase.service';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), ThrottlerModule.forRoot([{
+    ttl: 60000,
+    limit: 10,
+  }])],
   controllers: [RecipeController],
-  providers: [RecipeService, PrismaService, SearchService, AuthService, FirebaseService],
+  providers: [RecipeService, PrismaService, SearchService, AuthService, FirebaseService, {
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard
+  }
+  ],
 })
 export class AppModule { }

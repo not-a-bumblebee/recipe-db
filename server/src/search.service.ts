@@ -121,7 +121,6 @@ export class SearchService {
                                     }
                                 }
                             })
-
                         },
                         {
                             ...(excludedTags != null && {

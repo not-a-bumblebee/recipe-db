@@ -42,7 +42,7 @@ export class RecipeService {
   }
 
   async getRecipe(id: string): Promise<Recipe> {
-    return await this.prisma.recipe.findUnique({
+    return await this.prisma.recipe.findUniqueOrThrow({
       where: { id: parseInt(id) },
       include: {
         creator: {
@@ -207,9 +207,8 @@ export class RecipeService {
     return updateRes
   }
 
-  async deleteRecipe(id, uid): Promise<void> {
+  async deleteRecipe({ id, uid }): Promise<void> {
 
-    this.deleteStrayTags()
 
     let target = await this.prisma.recipe.delete({
       where: {
@@ -217,11 +216,10 @@ export class RecipeService {
       }
     })
     
-  }
+    await this.deleteImage(target.image_url)
 
-  searchRecipe(): string {
-    return
-  }
+    await this.deleteStrayTags()
 
+  }
 
 }

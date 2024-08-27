@@ -1,6 +1,6 @@
 "use client"
 import '@mantine/core/styles.css';
-import { ColorSchemeScript, Flex, MantineProvider, Paper } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -31,22 +31,20 @@ export default function RootLayout({
 
   // checks if Oauth user has set their username.
   // Redirects them if they haven't
-
   useEffect(() => {
-    console.log("BIG EFFECT", userCred?.displayName == 'anonymouse', _hasHydrated);
-    console.log(pathname);
 
     if (userCred?.displayName == 'anonymouse' && _hasHydrated) {
       router.push("/settings")
     }
-
 
   }, [pesterUsername, pathname])
 
 
   return (
     <html lang="en">
-
+      <head>
+        <title>Recipe-DB</title>
+      </head>
       <body className={inter.className}>
         <MantineProvider>
           <SearchBar />

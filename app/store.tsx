@@ -1,16 +1,7 @@
-import { User, UserCredential } from 'firebase/auth'
-import firebase from 'firebase/compat/app'
+import { User } from 'firebase/auth'
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
-// interface MyUser extends UserCredential{
-//     user:{
-//         stsTokenManager:{
-//             accessToken:string,
-//             expirationTime
-//         }
-//     }
-// }
 
 interface AuthState {
     isLoggedIn: boolean,
@@ -50,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
             onRehydrateStorage: (state) => {
                 return () => state.setHasHydrated(true)
             },
-            name: 'auth-storage', // name of the item in the storage (must be unique)
+            name: 'auth-storage', 
         },
     ),
 

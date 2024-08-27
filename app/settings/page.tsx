@@ -3,11 +3,12 @@
 import { Alert, Button, Flex, Group, Modal, TextInput } from "@mantine/core"
 import { useField } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../store";
-import axios, { toFormData } from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import CardLayout from "@/components/CardLayout";
+import { auth } from "../firebase";
 
 
 export default function SettingsPage() {
@@ -15,12 +16,13 @@ export default function SettingsPage() {
     const [modalOption, setModalOption] = useState<null | string>(null)
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
     const userCred = useAuthStore((state) => state.userCred)
+    const logoutUser = useAuthStore((state) => state.logoutUser)
 
     const _hasHydrated = useAuthStore((state) => state._hasHydrated)
     const router = useRouter()
 
     useEffect(() => {
-        console.log(isLoggedIn);
+        // console.log(isLoggedIn);
 
         if (!isLoggedIn && _hasHydrated) {
             router.push("/")
@@ -34,30 +36,54 @@ export default function SettingsPage() {
     });
 
     const editUsername = async () => {
-        console.log(await usernameField.validate());
-        let valid = await usernameField.validate()
-        if (valid == null) {
-            let token = await userCred?.getIdToken()
-            let res = await axios.post('http://localhost:4000/user/update', { username: usernameField.getValue().trim(), uid: userCred?.uid }, {
-                headers: {
-                    Authorization: token
-                }
-            })
-            console.log(res);
 
-            if (res.status == 200 || res.status == 201) {
-                router.push("/")
-                window.location.reload()
+        try {
+            // if no changes, do nothing
+            if (usernameField.getValue() === userCred?.displayName) {
+                return
             }
-            else {
-                usernameField.setError(res.data.error)
+
+
+            let valid = await usernameField.validate()
+            if (valid == null) {
+                let token = await userCred?.getIdToken()
+                let res = await axios.post('http://localhost:4000/user/update', { username: usernameField.getValue().trim(), uid: userCred?.uid }, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
+                // console.log(res);
+
+                if (res.status == 200 || res.status == 201) {
+                    router.push("/")
+                    window.location.reload()
+                }
+                else {
+                    usernameField.setError(res.data.error)
+                }
+            }
+        } catch (error) {
+            console.error(error)
+            // error.response.data.error
+            let errorReasons = error as Error | AxiosError
+
+            if (axios.isAxiosError(errorReasons)) {
+                usernameField.setError(errorReasons?.response?.data.error)
             }
         }
-
     }
 
     const deleteAccount = async () => {
+        try {
+            let idToken = await auth.currentUser?.getIdToken()
+            let { data } = await axios.delete('http://localhost:4000/user/', { data: { uid: userCred?.uid }, headers: { Authorization: idToken } })
+            // console.log(data);
 
+            logoutUser()
+
+        } catch (error) {
+            console.error(error)
+        }
     }
 
 
@@ -69,7 +95,7 @@ export default function SettingsPage() {
                 (<Flex justify={"center"} mt={60}>
 
                     <Alert w={'60%'} variant="light" color="cyan" title="Set Username" >
-                        Before you can continue, please change your username.
+                        Before you can continue, please set your username.
                     </Alert>
                 </Flex>
                 )}
@@ -93,7 +119,7 @@ export default function SettingsPage() {
                         <TextInput {...usernameField.getInputProps()} label="new username" />
                     )}
                     <Group justify="space-between">
-                        <Button onClick={() => { setModalOption(null); close }}>Cancel</Button>
+                        <Button onClick={() => { setModalOption(null); close() }}>Cancel</Button>
 
                         {modalOption === "account" && <Button onClick={deleteAccount}>Delete Account</Button>}
                         {modalOption === "username" && <Button onClick={editUsername}>Change Username</Button>}
