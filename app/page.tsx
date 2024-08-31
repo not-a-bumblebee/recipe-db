@@ -38,7 +38,7 @@ export default function Home() {
   const fetchRecipes = async () => {
     try {
 
-      let { data } = await axios.get('http://localhost:4000/examples')
+      let { data } = await axios.get('http://44.202.5.128:4000/examples')
       // console.log(data);
 
       const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)

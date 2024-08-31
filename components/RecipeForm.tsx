@@ -143,7 +143,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
             console.log("Sending: ", data);
 
-            let res = await axios.post('http://localhost:4000/create', toFormData(data))
+            let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/create', toFormData(data))
 
             console.log(res);
 
@@ -194,7 +194,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
             console.log("Recipe Changes: ", recipeChanges);
 
-            let { data, status } = await axios.put('http://localhost:4000/update', recipeChanges, {
+            let { data, status } = await axios.put('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/update', recipeChanges, {
                 headers: {
                     Authorization: idToken
                 }

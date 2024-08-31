@@ -54,7 +54,7 @@ export default function LoginPage() {
         let data = loginForm.getValues()
         // console.log(data);
 
-        // let res = await axios.post('http://localhost:4000/login', toFormData(data))
+        // let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/login', toFormData(data))
         try {
             let userCred = await signInWithEmailAndPassword(auth, data.email, data.password)
             loginUser(userCred.user)
@@ -81,7 +81,7 @@ export default function LoginPage() {
             // console.log(bonusCred);
             // adds them to our user db if new
             if (bonusCred?.isNewUser) {
-                let res = await axios.post('http://localhost:4000/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
+                let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
                 // console.log("OAUTH REGISTERING", res);
 
                 setPesterUsername(true)

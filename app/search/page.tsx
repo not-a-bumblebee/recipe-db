@@ -33,7 +33,7 @@ export default function SearchPage() {
     // console.log(query);
 
     const fetchRecipes = async () => {
-        let { data } = await axios.get('http://localhost:4000/search/' + query)
+        let { data } = await axios.get('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/search/' + query)
         // console.log(data);
 
         const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)

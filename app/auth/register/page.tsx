@@ -60,7 +60,7 @@ export default function RegisterPage() {
 
             // console.log(data);
 
-            let res = await axios.post('http://localhost:4000/register', data)
+            let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/register', data)
             // console.log(res);
 
 
