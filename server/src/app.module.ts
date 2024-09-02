@@ -12,7 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), ThrottlerModule.forRoot([{
     ttl: 60000,
-    limit: 10,
+    limit: 30,
   }])],
   controllers: [RecipeController],
   providers: [RecipeService, PrismaService, SearchService, AuthService, FirebaseService, {

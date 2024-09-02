@@ -11,7 +11,7 @@ export default function SearchBar() {
     // const modeRef = useRef<HTMLInputElement>(null)
     // const searchRef = useRef<HTMLInputElement>(null)
     const searchParams = useSearchParams()
-    const query = searchParams.get("query")
+    const query = searchParams?.get("query")
     const router = useRouter()
     const [inputQuery, setInputQuery] = useState(query ?? "")
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn)

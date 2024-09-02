@@ -28,6 +28,8 @@ interface RecipeType {
     instructions: string
 }
 
+
+
 export default function RecipePage() {
     const [recipe, setRecipe] = useState<RecipeType>()
     const params = useParams<{ id: string }>()
@@ -40,7 +42,7 @@ export default function RecipePage() {
 
     const fetchRecipe = async () => {
         try {
-            let { data } = await axios.get('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/recipe/' + params.id)
+            let { data } = await axios.get('http://ec2-18-234-104-66.compute-1.amazonaws.com:4000/recipe/' + params?.id)
 
             if (data) {
                 // console.log(data);

@@ -29,7 +29,7 @@ export default function SearchPage() {
     const [rCards, setRCards] = useState()
 
     const searchParams = useSearchParams()
-    const query = searchParams.get("query")
+    const query = searchParams?.get("query")
     // console.log(query);
 
     const fetchRecipes = async () => {

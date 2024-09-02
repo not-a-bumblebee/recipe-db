@@ -1,13 +1,13 @@
 "use client"
-import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SearchBar from '@/components/Searchbar';
+import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
-const inter = Inter({ subsets: ["latin"] });
 import '@mantine/tiptap/styles.css';
+const inter = Inter({ subsets: ["latin"] });
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from './store';
