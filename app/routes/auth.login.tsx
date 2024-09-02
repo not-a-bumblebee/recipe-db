@@ -41,8 +41,13 @@ export default function LoginPage() {
     });
     useEffect(() => {
         // console.log(isLoggedIn);
+        if (userCreds?.displayName == 'anonymouse' && isLoggedIn && _hasHydrated) {
+            console.log("Redirected");
 
-        if (isLoggedIn && _hasHydrated && userCreds?.displayName != 'anonymouse' && !pesterUsername) {
+            navigate("/settings")
+        }
+
+        else if (isLoggedIn && _hasHydrated && userCreds?.displayName != 'anonymouse' && !pesterUsername) {
             navigate("/")
         }
     }, [_hasHydrated, isLoggedIn, pesterUsername])
@@ -52,7 +57,6 @@ export default function LoginPage() {
         let data = loginForm.getValues()
         // console.log(data);
 
-        // let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com/login', toFormData(data))
         try {
             let userCred = await signInWithEmailAndPassword(auth, data.email, data.password)
             loginUser(userCred.user)
@@ -68,23 +72,26 @@ export default function LoginPage() {
         try {
 
             let userCred = await signInWithPopup(auth, new GoogleAuthProvider())
-            if (auth.currentUser) {
-                updateProfile(auth.currentUser, {
-                    displayName: "anonymouse"
-                })
-            }
+
 
             // console.log(userCred);
             let bonusCred = getAdditionalUserInfo(userCred)
             // console.log(bonusCred);
             // adds them to our user db if new
             if (bonusCred?.isNewUser) {
+                if (auth.currentUser) {
+                    updateProfile(auth.currentUser, {
+                        displayName: "anonymouse"
+                    })
+                }
                 let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
                 // console.log("OAUTH REGISTERING", res);
 
                 setPesterUsername(true)
                 // redirect to ask for username when done
                 // loginUser(userCred)
+                console.log("sign redirect");
+
                 navigate("/settings")
             }
         } catch (error) {

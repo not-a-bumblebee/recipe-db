@@ -3,31 +3,41 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 
-interface AuthState {
+interface State {
     isLoggedIn: boolean,
     userCred: User | null,
+    pesterUsername: boolean,
+    _hasHydrated?: boolean,
+    idToken: string | null,
+
+}
+
+interface Actions {
     loginUser: (user: User) => void,
     logoutUser: () => void,
-    _hasHydrated: boolean,
     setHasHydrated: (state: boolean) => void,
-    idToken: string | null,
     setIdToken: (token: string) => void,
-    pesterUsername: boolean,
     setPesterUsername: (state: boolean) => void
 
 }
 
-export const useAuthStore = create<AuthState>()(
+const initialState: State = {
+
+    pesterUsername: false,
+    isLoggedIn: false,
+    userCred: null,
+    idToken: null,
+}
+
+
+export const useAuthStore = create<State & Actions>()(
 
     persist(
         (set, get) => ({
+            ...initialState,
             _hasHydrated: false,
-            pesterUsername: false,
-            isLoggedIn: false,
-            userCred: null,
-            idToken: null,
             loginUser: (user) => set({ userCred: user, isLoggedIn: true }),
-            logoutUser: () => set({ userCred: null, isLoggedIn: false }),
+            logoutUser: () => set(initialState),
             setIdToken: (token) => set({ idToken: token }),
             setPesterUsername: (state) => set({ pesterUsername: state }),
             setHasHydrated: (state) => {
@@ -41,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
             onRehydrateStorage: (state) => {
                 return () => state.setHasHydrated(true)
             },
-            name: 'auth-storage', 
+            name: 'auth-storage',
         },
     ),
 

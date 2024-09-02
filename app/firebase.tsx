@@ -21,7 +21,7 @@ onAuthStateChanged(auth, async (user) => {
         // console.log("User: ", user);
 
         // set/refresh idToken state in zustad after initialization
-        
+
         let idToken = await user.getIdToken()
         useAuthStore.getState().setIdToken(idToken)
 
@@ -31,7 +31,7 @@ onAuthStateChanged(auth, async (user) => {
     else {
         // console.log("No Users ", user);
         // resets the zustand data
-        useAuthStore?.persist?.clearStorage()
+        useAuthStore.getState().logoutUser()
 
     }
 })
