@@ -84,7 +84,7 @@ export default function LoginPage() {
                         displayName: "anonymouse"
                     })
                 }
-                let res = await axios.post('https://myseriousdroods.com/api/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
+                let res = await axios.post('https://mysteriousdroods.com/api/register/oauth', { email: userCred.user.email, uid: userCred.user?.uid })
                 // console.log("OAUTH REGISTERING", res);
 
                 setPesterUsername(true)
