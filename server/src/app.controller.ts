@@ -11,14 +11,14 @@ import { AuthGuard } from './auth.guard';
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService, private readonly searchService: SearchService, private readonly authService: AuthService) { }
 
-  @Get('/recipe/:id')
+  @Get('/api/recipe/:id')
   getRecipe(@Param('id') id: string): Promise<Recipe> {
     console.log("Getting Recipe #", id);
 
     return this.recipeService.getRecipe(id);
   }
 
-  @Get('/search/:query')
+  @Get('/api/search/:query')
   searchRecipes(@Param('query') query: string): Promise<Recipe[]> {
     console.log("Searching for recipe with query: ", query);
 
@@ -26,7 +26,7 @@ export class RecipeController {
     return this.searchService.mixSearch(query)
   }
 
-  @Post('/register')
+  @Post('/api/register')
   registerUser(@Body() body) {
     const { email, username, password } = body
     console.log("Registering a new user");
@@ -39,7 +39,7 @@ export class RecipeController {
   }
 
 
-  @Post('/register/oauth')
+  @Post('/api/register/oauth')
   registerOAuth(@Body() body) {
     const { email, uid } = body
     console.log("OAUTH Registering: ", email, uid);
@@ -48,7 +48,7 @@ export class RecipeController {
     return userCred
   }
 
-  @Post('/user/update')
+  @Post('/api/user/update')
   @UseGuards(AuthGuard)
   setUsername(@Body() body) {
     const { username, uid } = body
@@ -62,7 +62,7 @@ export class RecipeController {
   }
 
 
-  @Get('/examples')
+  @Get('/api/examples')
   getExamples() {
     console.log("Fetching examples");
     
@@ -71,7 +71,7 @@ export class RecipeController {
   }
 
 
-  @Post('/create')
+  @Post('/api/create')
   @UseInterceptors(FileInterceptor('file'))
   postRecipe(@Body() body, @UploadedFile(
     new ParseFilePipe({
@@ -88,7 +88,7 @@ export class RecipeController {
   }
 
 
-  @Put('/update')
+  @Put('/api/update')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   updateRecipe(@Body() body, @UploadedFile(
@@ -109,7 +109,7 @@ export class RecipeController {
   }
 
 
-  @Delete('/recipe')
+  @Delete('/api/recipe')
   @UseGuards(AuthGuard)
   deleteRecipe(@Body() body): Promise<void> {
     console.log("Deleting recipe");
@@ -121,7 +121,7 @@ export class RecipeController {
   }
 
 
-  @Delete('/user')
+  @Delete('/api/user')
   @UseGuards(AuthGuard)
   deleteUser(@Body() body): Promise<void> {
     console.log("Deleting User");
