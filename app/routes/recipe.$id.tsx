@@ -42,7 +42,7 @@ export default function RecipePage() {
 
     const fetchRecipe = async () => {
         try {
-            let { data } = await axios.get('http://ec2-18-234-104-66.compute-1.amazonaws.com/recipe/' + params?.id)
+            let { data } = await axios.get('https://myseriousdroods.com/api/recipe/' + params?.id)
 
             if (data) {
                 // console.log(data);
@@ -58,7 +58,7 @@ export default function RecipePage() {
     const deleteRecipe = async () => {
         try {
             let idToken = await auth.currentUser?.getIdToken()
-            let { data } = await axios.delete('http://ec2-18-234-104-66.compute-1.amazonaws.com/recipe/', { data: { uid: userCred?.uid, id: recipe?.id }, headers: { Authorization: idToken } })
+            let { data } = await axios.delete('https://myseriousdroods.com/api/recipe/', { data: { uid: userCred?.uid, id: recipe?.id }, headers: { Authorization: idToken } })
 
             if (data) {
                 // console.log(data);

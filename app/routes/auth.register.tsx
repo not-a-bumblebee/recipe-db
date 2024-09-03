@@ -60,7 +60,7 @@ export default function RegisterPage() {
 
             // console.log(data);
 
-            let res = await axios.post('http://ec2-18-234-104-66.compute-1.amazonaws.com/register', data)
+            let res = await axios.post('https://myseriousdroods.com/api/register', data)
             // console.log(res);
 
 
