@@ -23,7 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const pesterUsername = useAuthStore((state) => state.pesterUsername)
   const _hasHydrated = useAuthStore((state) => state._hasHydrated)
   const userCred = useAuthStore((state) => state.userCred)
-  
+
   const location = useLocation()
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
         <Meta />
         <Links />
       </head>
