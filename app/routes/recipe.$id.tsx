@@ -58,10 +58,9 @@ export default function RecipePage() {
     const deleteRecipe = async () => {
         try {
             let idToken = await auth.currentUser?.getIdToken()
-            let { data } = await axios.delete('https://api.mysteriousdroods.com/recipe/', { data: { uid: userCred?.uid, id: recipe?.id }, headers: { Authorization: idToken } })
+            let { status } = await axios.delete('https://api.mysteriousdroods.com/recipe/', { data: { uid: userCred?.uid, id: recipe?.id }, headers: { Authorization: idToken } })
 
-            if (data) {
-                // console.log(data);
+            if (status == 200) {
 
                 navigate("/")
             }
@@ -75,7 +74,7 @@ export default function RecipePage() {
         fetchRecipe()
 
     }, [])
-    
+
     return (
         <CardLayout>
 
