@@ -142,7 +142,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
             console.log("Sending: ", data);
 
-            let res = await axios.post('https://mysteriousdroods.com/api/create', toFormData(data))
+            let res = await axios.post('https://api.mysteriousdroods.com/create', toFormData(data))
 
             console.log(res);
 
@@ -193,7 +193,7 @@ export default function RecipeForm({ duration, image_url, ingredients, instructi
 
             console.log("Recipe Changes: ", recipeChanges);
 
-            let { data, status } = await axios.put('https://mysteriousdroods.com/api/update', recipeChanges, {
+            let { data, status } = await axios.put('https://api.mysteriousdroods.com/update', recipeChanges, {
                 headers: {
                     Authorization: idToken
                 }
