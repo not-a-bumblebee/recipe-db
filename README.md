@@ -1,4 +1,4 @@
-# [Link](http://recipe-bucket6699.s3-website-us-west-2.amazonaws.com)
+[page link](https://d331ewo1lx7uep.cloudfront.net/)
 
 Recipe-DB is a remix single page application with a Nest JS backend where you can:
   - Create recipes
@@ -11,8 +11,7 @@ Recipe-DB is a remix single page application with a Nest JS backend where you ca
 
 Features:
   - Image uploads to AWS S3
-  - Backend deployed on an AWS EC2 instance
-  - DNS by CloudFlare
+  - Backend deployed using Lambda for serverless
   - User authentication by Firebase
   - Zustand for global state management
-  - Search engine built using Prisma and Postgresql with RDS AWS
+  - Search engine built using Prisma and Postgresql with RDS 
