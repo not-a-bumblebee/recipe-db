@@ -32,7 +32,7 @@ export default function SearchPage() {
     // console.log(query);
 
     const fetchRecipes = async () => {
-        let { data } = await axios.get('https://api.mysteriousdroods.com/search/' + query)
+        let { data } = await axios.get('https://50unbygcva.execute-api.us-west-2.amazonaws.com/dev/search/' + query)
         // console.log(data);
 
         const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)

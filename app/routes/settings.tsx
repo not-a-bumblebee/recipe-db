@@ -47,7 +47,7 @@ export default function SettingsPage() {
             let valid = await usernameField.validate()
             if (valid == null) {
                 let token = await userCred?.getIdToken()
-                let res = await axios.post('https://api.mysteriousdroods.com/user/update', { username: usernameField.getValue().trim(), uid: userCred?.uid }, {
+                let res = await axios.post('https://50unbygcva.execute-api.us-west-2.amazonaws.com/dev/user/update', { username: usernameField.getValue().trim(), uid: userCred?.uid }, {
                     headers: {
                         Authorization: token
                     }
@@ -76,7 +76,7 @@ export default function SettingsPage() {
     const deleteAccount = async () => {
         try {
             let idToken = await auth.currentUser?.getIdToken()
-            let { data } = await axios.delete('https://api.mysteriousdroods.com/user/', { data: { uid: userCred?.uid }, headers: { Authorization: idToken } })
+            let { data } = await axios.delete('https://50unbygcva.execute-api.us-west-2.amazonaws.com/dev/user/', { data: { uid: userCred?.uid }, headers: { Authorization: idToken } })
             // console.log(data);
 
             logoutUser()

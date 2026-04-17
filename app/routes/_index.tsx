@@ -39,7 +39,7 @@ export default function Index() {
   const fetchRecipes = async () => {
     try {
 
-      let { data } = await axios.get('https://api.mysteriousdroods.com/examples')
+      let { data } = await axios.get('https://50unbygcva.execute-api.us-west-2.amazonaws.com/dev/examples')
       // console.log(data);
 
       const cardResults = data.map((x: RecipeType) => <RecipeCard {...x} key={x.id} />)
