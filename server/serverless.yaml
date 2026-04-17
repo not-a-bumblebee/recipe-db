@@ -1,0 +1,21 @@
+service: recipe-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-west-2
+  environment:
+    AWS_S3_REGION: ${env:AWS_S3_REGION}
+    BUCKET_NAME: ${env:BUCKET_NAME}
+    FIRE_ADMIN: ${env:FIRE_ADMIN}
+    DATABASE_URL: ${env:DATABASE_URL}
+
+functions:
+  main:
+    handler: dist/lambda.handler
+    timeout: 30
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
+          cors: true

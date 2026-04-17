@@ -14,8 +14,7 @@ export class RecipeService {
   private readonly s3Client = new S3Client({
     region: this.configService.getOrThrow('AWS_S3_REGION')
   })
-  private readonly CDN_URL = 'https://d1p9uf8cei0o4.cloudfront.net/';
-  // deletes any tags that have no associated fields in the recipe_tags tables.
+  private readonly CDN_URL = this.configService.getOrThrow('CDN_URL');  // deletes any tags that have no associated fields in the recipe_tags tables.
   async deleteStrayTags() {
     let res = await this.prisma.tag.deleteMany({
       where: {

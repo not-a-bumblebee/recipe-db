@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -13,38 +14,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User{
-  id Int @default(autoincrement()) @id
-  firebase_id String @unique
-  username String? @default("anonymouse")
-  email String @unique
-  recipes Recipe[]
+model User {
+  id          Int      @id @default(autoincrement())
+  firebase_id String   @unique
+  username    String?  @default("anonymouse")
+  email       String   @unique
+  recipes     Recipe[]
 }
 
-model Recipe{
-  id Int @default(autoincrement()) @id
-  recipe_name String
-  duration String
+model Recipe {
+  id           Int          @id @default(autoincrement())
+  recipe_name  String
+  duration     String
   serving_size String
-  ingredients String
-  creator User @relation(fields: [user_id], references: [firebase_id], onDelete: Cascade)
-  user_id String
-  image_url String
+  ingredients  String
+  creator      User         @relation(fields: [user_id], references: [firebase_id], onDelete: Cascade)
+  user_id      String
+  image_url    String
   instructions String
+  recipeTag    RecipeTags[]
+}
+
+model Tag {
+  id        Int          @id @default(autoincrement())
+  tag_name  String       @unique
   recipeTag RecipeTags[]
 }
 
-model Tag{
-  id Int @default(autoincrement()) @id
-  tag_name String @unique
-  recipeTag RecipeTags[]
-}
+model RecipeTags {
+  recipe    Recipe @relation(fields: [recipe_id], references: [id], onDelete: Cascade)
+  recipe_id Int
+  tag       Tag    @relation(fields: [tag_id], references: [id])
+  tag_id    Int
 
-model RecipeTags{
-  recipe Recipe @relation(fields: [recipe_id],references: [id], onDelete: Cascade)
-  recipe_id Int 
-  tag Tag  @relation(fields: [tag_id],references: [id])
-  tag_id Int 
-  @@id([recipe_id,tag_id])
+  @@id([recipe_id, tag_id])
 }
